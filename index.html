@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Visita ACE - Demonstração</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif;background:#eef3f1;color:#1d2b27;max-width:480px;margin:auto;min-height:100vh;padding-bottom:70px}
+header{background:#0b6b57;color:#fff;padding:14px 16px;position:sticky;top:0;z-index:5}
+header h1{font-size:18px;margin:0}header small{opacity:.85}
+.demo{background:#fff3cd;color:#664d03;font-size:12px;padding:6px 16px;text-align:center}
+main{padding:14px}
+.card{background:#fff;border-radius:12px;padding:14px;margin-bottom:12px;box-shadow:0 1px 3px #0002}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:#fff;border-radius:12px;padding:12px;text-align:center;box-shadow:0 1px 3px #0002}
+.stat b{display:block;font-size:28px}
+.red b{color:#c62828}.amb b{color:#e08600}.grn b{color:#0b6b57}.gry b{color:#555}
+nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;display:flex;border-top:1px solid #ccd}
+nav button{flex:1;border:0;background:none;padding:10px 0;font-size:12px;color:#666}
+nav button.on{color:#0b6b57;font-weight:700;border-top:3px solid #0b6b57}
+nav span{display:block;font-size:20px}
+.item{display:flex;justify-content:space-between;align-items:center;padding:12px 4px;border-bottom:1px solid #eee;cursor:pointer}
+.item:last-child{border:0}
+.tag{font-size:11px;padding:3px 8px;border-radius:99px;color:#fff;white-space:nowrap}
+.alto{background:#c62828}.medio{background:#e08600}.baixo{background:#0b6b57}.fech{background:#555}
+.crumb{font-size:13px;color:#0b6b57;margin-bottom:10px}.crumb a{text-decoration:underline;cursor:pointer}
+label{display:block;font-size:13px;font-weight:600;margin:12px 0 4px}
+input,select,textarea{width:100%;padding:11px;border:1px solid #bcc;border-radius:8px;font-size:16px;background:#fff}
+.row{display:flex;gap:8px}.row>*{flex:1}
+.chk{display:flex;align-items:center;gap:8px;font-weight:400;margin:6px 0}.chk input{width:22px;height:22px}
+.btn{width:100%;padding:14px;border:0;border-radius:10px;background:#0b6b57;color:#fff;font-size:16px;font-weight:700;margin-top:16px}
+.btn.sec{background:#fff;color:#0b6b57;border:2px solid #0b6b57}
+.photo{width:100%;margin-top:6px;border-radius:8px}
+h2{font-size:16px;margin:4px 0 10px}
+.bar{height:14px;border-radius:7px;background:#e3e9e7;overflow:hidden;margin:4px 0 10px}.bar i{display:block;height:100%}
+svg{width:100%;background:#dfeae6;border-radius:12px}
+.leg{font-size:12px;display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}.leg i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px}
+.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#0b6b57;color:#fff;padding:10px 18px;border-radius:99px;z-index:9;display:none}
+</style></head><body>
+<header><h1>🦟 Visita ACE</h1><small>Controle de endemias · modelo de demonstração</small></header>
+<div class="demo">DEMONSTRAÇÃO · todos os dados são fictícios</div>
+<div class="toast" id="toast"></div>
+<main id="app"></main>
+<nav id="nav"></nav>
+<script>
+var KEY="demo-ace-v1";
+var seed=[
+["Centro","Quadra 01","Rua das Flores",[["12","Casa","alto","Larva encontrada",3],["18","Casa","medio","Tratada",4],["24","Comércio","baixo","Sem foco",2],["30","Casa","baixo","Fechada",0]]],
+["Centro","Quadra 01","Rua do Comércio",[["5","Casa","baixo","Sem foco",5],["9","Terreno baldio","alto","Larva encontrada",0]]],
+["Centro","Quadra 02","Rua Nova",[["101","Casa","medio","Fechada",0],["115","Casa","baixo","Sem foco",2],["120","Casa abandonada","alto","Fechada",0]]],
+["Bairro Alto","Quadra 07","Rua do Sol",[["44","Casa","medio","Tratada",6],["50","Casa","baixo","Fechada",0],["58","Casa","alto","Larva encontrada",4]]],
+["Bairro Alto","Quadra 08","Rua da Paz",[["7","Casa","baixo","Sem foco",3],["13","Casa","medio","Fechada",0]]],
+["Sítio Lagoa","Quadra 01","Estrada Velha",[["S/N A","Casa","baixo","Sem foco",4],["S/N B","Casa","medio","Tratada",2],["S/N C","Terreno baldio","alto","Larva encontrada",0]]]
+];
+var nomes=["Maria (exemplo)","José (exemplo)","Ana (exemplo)","Carlos (exemplo)","Lúcia (exemplo)"];
+function load(){var s=localStorage.getItem(KEY);if(s)return JSON.parse(s);var d=[],id=1;
+seed.forEach(function(b,bi){b[3].forEach(function(h,hi){d.push({id:id++,loc:b[0],qd:b[1],rua:b[2],num:h[0],tipo:h[1],risco:h[2],status:h[3],mor:h[4],dono:nomes[(bi+hi)%5],visitas:[]})})});return d}
+var D=load(),V={tab:"inicio",loc:null,qd:null,rua:null,imv:null};
+function save(){localStorage.setItem(KEY,JSON.stringify(D))}
+function $(h){document.getElementById("app").innerHTML=h}
+function toast(t){var e=document.getElementById("toast");e.textContent=t;e.style.display="block";setTimeout(function(){e.style.display="none"},2200)}
+function go(t,o){V.tab=t;if(o)for(var k in o)V[k]=o[k];render();window.scrollTo(0,0)}
+function uniq(a){return a.filter(function(x,i){return a.indexOf(x)==i})}
+function tagr(r){return '<span class="tag '+r+'">'+{alto:"Risco alto",medio:"Risco médio",baixo:"Risco baixo"}[r]+'</span>'}
+function stat(h){return h.status=="Fechada"?'<span class="tag fech">Fechada</span>':h.status=="Larva encontrada"?'<span class="tag alto">Larva</span>':''}
+function nav(){var t=[["inicio","📊","Painel"],["imoveis","🏘️","Imóveis"],["mapa","🗺️","Mapa"]];
+document.getElementById("nav").innerHTML=t.map(function(x){return '<button class="'+(V.tab==x[0]?"on":"")+'" onclick="go(\''+x[0]+'\')"><span>'+x[1]+'</span>'+x[2]+'</button>'}).join("")}
+function inicio(){var n=D.length,l=D.filter(function(h){return h.status=="Larva encontrada"}).length,f=D.filter(function(h){return h.status=="Fechada"}).length,a=D.filter(function(h){return h.risco=="alto"}).length;
+var vis=D.reduce(function(s,h){return s+h.visitas.length},0);
+var locs=uniq(D.map(function(h){return h.loc})).map(function(L){var x=D.filter(function(h){return h.loc==L}),fc=x.filter(function(h){return h.status=="Larva encontrada"}).length,fe=x.filter(function(h){return h.status=="Fechada"}).length;
+return '<div>'+L+' <small>('+x.length+' imóveis)</small><div class="bar"><i style="width:'+fc/x.length*100+'%;background:#c62828;float:left"></i><i style="width:'+fe/x.length*100+'%;background:#555;float:left"></i></div><small>'+fc+' com larva · '+fe+' fechadas</small></div>'}).join("");
+$('<div class="grid"><div class="stat grn"><b>'+n+'</b>imóveis</div><div class="stat red"><b>'+l+'</b>com larva (focos)</div><div class="stat gry"><b>'+f+'</b>casas fechadas</div><div class="stat amb"><b>'+a+'</b>risco alto</div></div><div class="card" style="margin-top:12px"><h2>Resumo por localidade</h2>'+locs+'</div><div class="card"><h2>Hoje</h2>Visitas registradas nesta demonstração: <b>'+vis+'</b><br><button class="btn sec" onclick="go(\'imoveis\',{loc:null,qd:null,rua:null})">Começar visitas</button><button class="btn sec" style="margin-top:8px" onclick="if(confirm(\'Apagar visitas e voltar aos dados de exemplo?\')){localStorage.removeItem(KEY);D=load();render()}">Reiniciar demonstração</button></div>')}
+function crumb(){var c='<a onclick="go(\'imoveis\',{loc:null,qd:null,rua:null})">Localidades</a>';
+if(V.loc)c+=' › <a onclick="go(\'imoveis\',{qd:null,rua:null})">'+V.loc+'</a>';
+if(V.qd)c+=' › <a onclick="go(\'imoveis\',{rua:null})">'+V.qd+'</a>';if(V.rua)c+=' › '+V.rua;return '<div class="crumb">'+c+'</div>'}
+function imoveis(){var h=crumb(),L;
+if(!V.loc){L=uniq(D.map(function(x){return x.loc}));h+='<div class="card"><h2>Localidade</h2>'+L.map(function(x){var c=D.filter(function(y){return y.loc==x}).length;return '<div class="item" onclick="go(\'imoveis\',{loc:\''+x+'\'})"><span>'+x+'</span><small>'+c+' imóveis ›</small></div>'}).join("")+'</div>'}
+else if(!V.qd){L=uniq(D.filter(function(x){return x.loc==V.loc}).map(function(x){return x.qd}));h+='<div class="card"><h2>Quarteirão</h2>'+L.map(function(x){return '<div class="item" onclick="go(\'imoveis\',{qd:\''+x+'\'})"><span>'+x+'</span><small>›</small></div>'}).join("")+'</div>'}
+else if(!V.rua){L=uniq(D.filter(function(x){return x.loc==V.loc&&x.qd==V.qd}).map(function(x){return x.rua}));h+='<div class="card"><h2>Rua</h2>'+L.map(function(x){return '<div class="item" onclick="go(\'imoveis\',{rua:\''+x+'\'})"><span>'+x+'</span><small>›</small></div>'}).join("")+'</div>'}
+else{h+='<div class="card"><h2>Imóveis</h2>'+D.filter(function(x){return x.loc==V.loc&&x.qd==V.qd&&x.rua==V.rua}).map(function(x){return '<div class="item" onclick="go(\'form\',{imv:'+x.id+'})"><div><b>Nº '+x.num+'</b> · '+x.tipo+'<br><small>'+x.dono+' · '+x.mor+' moradores</small></div><div style="text-align:right">'+tagr(x.risco)+'<br>'+stat(x)+'</div></div>'}).join("")+'</div>'}
+$(h)}
+function form(){var x=D.filter(function(y){return y.id==V.imv})[0];
+var hist=x.visitas.length?'<div class="card"><h2>Visitas anteriores</h2>'+x.visitas.map(function(v){return '<small>'+v.data+' · '+v.status+(v.dep?' · '+v.dep:'')+'</small><br>'}).join("")+'</div>':'';
+$('<div class="crumb"><a onclick="go(\'imoveis\')">‹ Voltar</a></div><div class="card"><h2>'+x.rua+', '+x.num+'</h2><small>'+x.loc+' · '+x.qd+' · '+x.tipo+'</small><br>'+tagr(x.risco)+'</div>'+hist+'<div class="card"><h2>Registrar visita</h2>'
++'<label>Situação</label><select id="st"><option>Visitada</option><option>Fechada</option><option>Recusada</option></select>'
++'<label>Nome do proprietário</label><input id="dn" value="'+x.dono+'">'
++'<label>Moradores</label><input id="mo" type="number" min="0" value="'+x.mor+'">'
++'<label>Tipo de depósito</label><select id="dp"><option value="">Nenhum</option><option>A1 - caixa d\'água</option><option>A2 - tambor/cisterna</option><option>B - vaso/pratinho</option><option>C - lixo/entulho</option><option>D1 - pneu</option><option>E - ralo/laje</option></select>'
++'<label class="chk"><input type="checkbox" id="lv">Larva encontrada</label><label class="chk"><input type="checkbox" id="tr">Tratamento realizado</label>'
++'<label>Grau de risco</label><select id="rk"><option value="baixo">Baixo</option><option value="medio">Médio</option><option value="alto">Alto</option></select>'
++'<label>Observações</label><textarea id="ob" rows="2" placeholder="Ex.: lixo no quintal, terreno baldio..."></textarea>'
++'<label>Foto na hora</label><input type="file" accept="image/*" capture="environment" id="ft" onchange="prev(this)"><img id="pv" class="photo" style="display:none">'
++'<button class="btn" onclick="gravar('+x.id+')">Salvar visita</button></div>');
+document.getElementById("rk").value=x.risco}
+function prev(i){var f=i.files[0];if(!f)return;var r=new FileReader();r.onload=function(){var p=document.getElementById("pv");p.src=r.result;p.style.display="block"};r.readAsDataURL(f)}
+function gravar(id){var x=D.filter(function(y){return y.id==id})[0],g=function(i){return document.getElementById(i)};
+var st=g("st").value,lv=g("lv").checked;x.status=st=="Fechada"?"Fechada":lv?"Larva encontrada":g("tr").checked?"Tratada":"Sem foco";
+x.dono=g("dn").value;x.mor=+g("mo").value;x.risco=g("rk").value;
+x.visitas.push({data:new Date().toLocaleString("pt-BR"),status:x.status,dep:g("dp").value});save();toast("Visita salva ✔");go("imoveis")}
+function mapa(){var qs=uniq(D.map(function(x){return x.loc+"|"+x.qd}));var s='<svg viewBox="0 0 360 320"><path d="M0 160H360M120 0V320M240 0V320" stroke="#fff" stroke-width="10"/>';
+var pos={};qs.forEach(function(q,i){pos[q]=[20+(i%3)*120,15+Math.floor(i/3)*160]});
+qs.forEach(function(q){var p=pos[q],x=D.filter(function(h){return h.loc+"|"+h.qd==q});
+s+='<rect x="'+(p[0]+8)+'" y="'+(p[1]+8)+'" width="84" height="124" rx="8" fill="#c9d9d3"/><text x="'+(p[0]+50)+'" y="'+(p[1]+24)+'" font-size="9" text-anchor="middle" fill="#345">'+q.split("|")[0]+' '+q.split("|")[1].replace("Quadra ","Q")+'</text>';
+x.forEach(function(h,i){var c=h.status=="Larva encontrada"?"#c62828":h.status=="Fechada"?"#555":"#0b6b57";s+='<circle cx="'+(p[0]+26+(i%3)*24)+'" cy="'+(p[1]+50+Math.floor(i/3)*26)+'" r="9" fill="'+c+'" stroke="#fff" stroke-width="2"/>'})});
+s+='</svg>';
+$('<div class="card"><h2>Mapa de focos e casas fechadas</h2>'+s+'<div class="leg"><span><i style="background:#c62828"></i>Larva</span><span><i style="background:#555"></i>Fechada</span><span><i style="background:#0b6b57"></i>Sem foco/tratada</span></div><small style="display:block;margin-top:8px">Esquema ilustrativo. Na versão real, os pontos entram no mapa da cidade pelo GPS.</small></div>')}
+function render(){nav();({inicio:inicio,imoveis:imoveis,form:form,mapa:mapa})[V.tab]()}
+render();
+</script></body></html>
